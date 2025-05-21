@@ -10,7 +10,15 @@ if theme.menu
             if value.split('||')[1]
               - var icon_value = trim(value.split('||')[1])
               - var anima_value = value.split('||')[2] ? trim(value.split('||')[2]) : 'faa-tada'
-              if icon_value.substring(0,2)=="fa"      
+              //- 新增SVG判断逻辑
+              if icon_value.startsWith('http') || icon_value.endsWith('.svg')
+                img.anzhiyufont(
+                  style="font-size: 0.9em;vertical-align: -0.1em;margin-right: 2px;width: 1.1em;height: 1.1em;",
+                  class=anima_value,
+                  src=icon_value,
+                  alt="menu-icon"
+                )
+              else if icon_value.substring(0,2)=="fa"      
                 i(class=icon_value + ' ' + anima_value)
               else if icon_value.substring(0,4)=="icon"
                 svg.icon(aria-hidden="true" class=anima_value)
@@ -24,12 +32,20 @@ if theme.menu
             if label.split('||')[1]
               - var icon_label = trim(label.split('||')[1])
               - var anima_label = label.split('||')[2] ? trim(label.split('||')[2]) : 'faa-tada'
-              if icon_label.substring(0,2)=="fa"      
+              //- 修正变量名错误并添加SVG判断
+              if icon_label.startsWith('http') || icon_label.endsWith('.svg')
+                img.anzhiyufont(
+                  style="font-size: 0.9em;vertical-align: -0.1em;margin-right: 2px;width: 1.1em;height: 1.1em;",
+                  class=anima_label,
+                  src=icon_label,
+                  alt="menu-icon"
+                )
+              else if icon_label.substring(0,2)=="fa"      
                 i(class=icon_label + ' ' + anima_label)
-              else if (icon_label.startsWith("icon"))
+              else if icon_label.startsWith("icon")
                 svg.icon(aria-hidden="true" class=anima_label)
                   use(xlink:href=`#`+ icon_label)
-              else if (icon_label.startsWith("anzhiyu"))
+              else if icon_label.startsWith("anzhiyu")
                 i.anzhiyufont(style="font-size: 0.9em;" class=icon_label + ' ' + anima_label)
             span=' '+ trim(label.split('||')[0])
           ul.menus_item_child
@@ -39,11 +55,19 @@ if theme.menu
                   if val.split('||')[1]
                     - var icon_val = trim(val.split('||')[1])
                     - var anima_val = val.split('||')[2] ? trim(val.split('||')[2]) : 'faa-tada'
-                    if icon_val.substring(0,2)=="fa"      
+                    //- 子菜单添加SVG判断
+                    if icon_val.startsWith('http') || icon_val.endsWith('.svg')
+                      img.anzhiyufont(
+                        style="font-size: 0.9em;vertical-align: -0.1em;margin-right: 2px;width: 1.1em;height: 1.1em;",
+                        class=anima_val,
+                        src=icon_val,
+                        alt="menu-icon"
+                      )
+                    else if icon_val.substring(0,2)=="fa"      
                       i(class=icon_val + ' ' + anima_val)
-                    else if (icon_val.startsWith("icon"))
+                    else if icon_val.startsWith("icon")
                       svg.icon(aria-hidden="true" class=anima_val)
                         use(xlink:href=`#`+ icon_val)
-                    else if (icon_val.startsWith("anzhiyu"))
+                    else if icon_val.startsWith("anzhiyu")
                       i.anzhiyufont(style="font-size: 0.9em;" class=icon_val + ' ' + anima_val)
                   span=' '+ lab
