@@ -16,6 +16,11 @@
       #center-console + label
         i
           background: var(--font-color)
+  if hexo-config('index_video')
+    +maxWidth768()
+      #center-console + label
+        i
+          background: var(--font-color)
 
     #site-info
       position: absolute
