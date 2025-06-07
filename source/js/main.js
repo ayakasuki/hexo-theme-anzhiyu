@@ -358,19 +358,11 @@ function initResponsiveBackground() {
     return;
   }
 
-  // 调试信息输出
-  console.debug('[背景加载器] 容器数据:', {
-    landscapeImg: mediaContainer.dataset.landscapeImg,
-    portraitImg: mediaContainer.dataset.portraitImg,
-    landscapeVideo: mediaContainer.dataset.landscapeVideo,
-    portraitVideo: mediaContainer.dataset.portraitVideo,
-    landscapePoster: mediaContainer.dataset.landscapePoster,
-    portraitPoster: mediaContainer.dataset.portraitPoster
-  });
-
-  // 清除现有媒体元素
+  // 清除现有媒体元素和加载动画
   const existingMedia = mediaContainer.querySelector('.home-media');
+  const existingLoader = mediaContainer.querySelector('.custom-loader');
   if (existingMedia) existingMedia.remove();
+  if (existingLoader) existingLoader.remove();
 
   // 检测屏幕方向 (竖屏: height > width)
   const isPortrait = window.innerHeight > window.innerWidth;
@@ -400,17 +392,29 @@ function initResponsiveBackground() {
   mediaElement.className = 'home-media';
   mediaElement.style.cssText = 'width:100%;height:100%;object-fit:cover';
   
+  // 创建自定义加载动画容器
+  const loaderContainer = document.createElement('div');
+  loaderContainer.className = 'custom-loader';
+  mediaContainer.prepend(loaderContainer);
+  
+  // 创建加载动画元素
+  const loaderElement = document.createElement('div');
+  loaderElement.className = 'loader-animation';
+  
+  // 设置加载动画样式（使用GIF）
+  loaderElement.style.backgroundImage = `url(${posterSrc})`;
+  loaderContainer.appendChild(loaderElement);
+  
   // 视频特殊处理
   if (mediaType === 'video') {
     mediaElement.autoplay = true;
     mediaElement.muted = true;
     mediaElement.loop = true;
     mediaElement.playsInline = true;
-    mediaElement.poster = posterSrc || '';
     mediaElement.setAttribute('playsinline', '');
     mediaElement.setAttribute('webkit-playsinline', '');
     
-    // 多源支持（处理302重定向）
+    // 多源支持
     const source = document.createElement('source');
     source.src = mediaSrc;
     source.type = 'video/mp4';
@@ -421,17 +425,36 @@ function initResponsiveBackground() {
     if (playPromise !== undefined) {
       playPromise.catch(error => {
         console.warn('[背景加载器] 自动播放被阻止:', error);
-        // 静音后重试播放
         mediaElement.muted = true;
         mediaElement.play();
       });
     }
+    
+    // 视频加载完成后移除加载动画
+    mediaElement.addEventListener('loadeddata', () => {
+      loaderContainer.style.opacity = '0';
+      setTimeout(() => {
+        if (loaderContainer.parentNode) {
+          loaderContainer.parentNode.removeChild(loaderContainer);
+        }
+      }, 500); // 淡出动画持续时间
+    });
   } else {
     mediaElement.src = mediaSrc;
     mediaElement.loading = 'eager';
+    
+    // 图片加载完成后移除加载动画
+    mediaElement.addEventListener('load', () => {
+      loaderContainer.style.opacity = '0';
+      setTimeout(() => {
+        if (loaderContainer.parentNode) {
+          loaderContainer.parentNode.removeChild(loaderContainer);
+        }
+      }, 500);
+    });
   }
 
-  // 错误处理（增强版）
+  // 错误处理
   mediaElement.onerror = function() {
     console.error(`[背景加载器] 资源加载失败: ${mediaSrc}`);
     this.style.display = 'none';
@@ -450,16 +473,15 @@ function initResponsiveBackground() {
     }
   };
 
-  mediaContainer.prepend(mediaElement);
+  mediaContainer.appendChild(mediaElement);
   console.log('[背景加载器] 媒体元素已创建');
 }
 
-// 初始化函数（兼容多种加载状态）
+// 初始化函数
 function initMedia() {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initResponsiveBackground);
   } else {
-    // 文档已加载完成，直接执行
     initResponsiveBackground();
   }
 }
@@ -477,7 +499,7 @@ window.addEventListener('resize', () => {
   }, 500);
 });
 
-// 页面可见性变化处理（避免标签页切换后视频暂停）
+// 页面可见性变化处理
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     const video = document.querySelector('#home-media-container video');
