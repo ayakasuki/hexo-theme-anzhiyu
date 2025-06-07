@@ -351,6 +351,8 @@ document.addEventListener("DOMContentLoaded", function () {
    * index_img和index_video的设置
    */
 // ======================= 横竖屏自适应背景媒体加载器 =======================
+let lastOrientation = null; // 记录上一次的方向状态
+
 function initResponsiveBackground() {
   const mediaContainer = document.getElementById('home-media-container');
   if (!mediaContainer) {
@@ -358,19 +360,29 @@ function initResponsiveBackground() {
     return;
   }
 
+  // 检测当前屏幕方向
+  const currentIsPortrait = window.innerHeight > window.innerWidth;
+  const currentOrientation = currentIsPortrait ? 'portrait' : 'landscape';
+  
+  // 如果方向未改变，则直接返回
+  if (lastOrientation === currentOrientation) {
+    console.log('[背景加载器] 方向未改变，无需重新加载');
+    return;
+  }
+  
+  // 更新方向记录
+  lastOrientation = currentOrientation;
+  console.log(`[背景加载器] 方向变化: ${currentOrientation}`);
+
   // 清除现有媒体元素和加载动画
   const existingMedia = mediaContainer.querySelector('.home-media');
   const existingLoader = mediaContainer.querySelector('.custom-loader');
   if (existingMedia) existingMedia.remove();
   if (existingLoader) existingLoader.remove();
 
-  // 检测屏幕方向 (竖屏: height > width)
-  const isPortrait = window.innerHeight > window.innerWidth;
-  console.log(`[背景加载器] 当前方向: ${isPortrait ? '竖屏' : '横屏'}`);
-
   // 根据方向选择资源
   let mediaSrc, posterSrc, mediaType;
-  if (isPortrait) {
+  if (currentIsPortrait) {
     mediaSrc = mediaContainer.dataset.portraitVideo || mediaContainer.dataset.portraitImg;
     posterSrc = mediaContainer.dataset.portraitPoster;
     mediaType = mediaContainer.dataset.portraitVideo ? 'video' : 'img';
@@ -462,7 +474,7 @@ function initResponsiveBackground() {
     // 尝试回退到备用类型
     console.warn('[背景加载器] 尝试回退到备用媒体');
     const fallbackType = mediaType === 'video' ? 'img' : 'video';
-    const fallbackSrc = isPortrait ? 
+    const fallbackSrc = currentIsPortrait ? 
       (mediaContainer.dataset.portraitImg || mediaContainer.dataset.portraitVideo) :
       (mediaContainer.dataset.landscapeImg || mediaContainer.dataset.landscapeVideo);
     
@@ -494,8 +506,17 @@ let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
-    console.log('[背景加载器] 窗口大小变化，重新加载媒体');
-    initResponsiveBackground();
+    // 计算当前方向状态
+    const currentIsPortrait = window.innerHeight > window.innerWidth;
+    const currentOrientation = currentIsPortrait ? 'portrait' : 'landscape';
+    
+    // 只有方向实际改变时才执行重载
+    if (lastOrientation !== currentOrientation) {
+      console.log('[背景加载器] 窗口大小变化，重新加载媒体');
+      initResponsiveBackground();
+    } else {
+      console.log('[背景加载器] 窗口大小变化但方向未改变');
+    }
   }, 500);
 });
 
