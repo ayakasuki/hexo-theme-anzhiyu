@@ -5,8 +5,27 @@
   #nav
     box-shadow: none;
     transition: 0.3s;
-
+   
   // index
+
+  #home-media-container
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  overflow: hidden
+  z-index: 0
+
+  .home-media
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    object-fit: cover
+    transition: opacity 0.5s ease
+    
   &.full_page
     height: $index_top_img_height
     background-attachment: fixed

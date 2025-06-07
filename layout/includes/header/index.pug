@@ -51,22 +51,15 @@ header#page-header(class=`${isHomeClass}`)
           img#post-top-bg(class='nolazyload' src=bg_img)
     else if is_home()
         // 媒体容器（继承原主题背景参数）
-        #home-media-container(style=`height:100%;background-attachment:fixed;z-index:0`)
-          if home_index_img
-            img.home-media(
-              src=homeImg
-              style='width:100%;height:100%;object-fit:cover'
-              loading="eager"
-              onerror="this.style.display='none'"
-            )
-          else if home_index_video
-            video.home-media(
-              autoplay muted loop playsinline
-              poster=theme.index_video && theme.index_video.poster
-              style='width:100%;height:100%;object-fit:cover'
-              onerror="this.style.display='none'"
-            )
-              source(src=homeVideo type="video/mp4")
+        #home-media-container(
+            data-landscape-img=home_index_img ? homeImg : ''
+            data-portrait-img=home_index_img && theme.index_img.path2 ? url_for(theme.index_img.path2) : ''
+            data-landscape-video=home_index_video ? homeVideo : ''
+            data-portrait-video=home_index_video && theme.index_video.path2 ? url_for(theme.index_video.path2) : ''
+            data-landscape-poster=home_index_video && theme.index_video.poster ? url_for(theme.index_video.poster) : ''
+            data-portrait-poster=home_index_video && theme.index_video.poster2 ? url_for(theme.index_video.poster2) : ''
+            style="height:100%;background-attachment:fixed;z-index:0"
+          )
         #site-info
           h1#site-title=site_title
           if theme.subtitle.enable
