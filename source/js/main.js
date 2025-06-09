@@ -572,8 +572,8 @@ function checkMediaStatus() {
   }
 }
 
-// 每5秒检查一次（轻量级检测）
-setInterval(checkMediaStatus, 5000);
+// 每0.5秒检查一次（轻量级检测）
+setInterval(checkMediaStatus, 500);
 
 // 4. 增强错误处理（在initResponsiveBackground函数内修改）
 // 在mediaElement.onerror函数内添加：
