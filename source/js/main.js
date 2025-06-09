@@ -403,7 +403,12 @@ function initResponsiveBackground() {
   const mediaElement = document.createElement(mediaType);
   mediaElement.className = 'home-media';
   mediaElement.style.cssText = 'width:100%;height:100%;object-fit:cover';
-  
+   // 在媒体容器添加媒体元素后调用效果函数
+   mediaContainer.appendChild(mediaElement);
+   addMediaEffects(mediaElement, mediaType); // 添加新功能
+   
+   console.log('[背景加载器] 媒体元素已创建');
+   
   // 创建自定义加载动画容器
   const loaderContainer = document.createElement('div');
   loaderContainer.className = 'custom-loader';
@@ -489,6 +494,50 @@ function initResponsiveBackground() {
   console.log('[背景加载器] 媒体元素已创建');
 }
 
+function addMediaEffects(mediaElement, mediaType) {
+  if (mediaType === 'video') {
+    // 1. 添加缩放动画效果
+    mediaElement.style.transform = 'scale(1.2)'; // 初始放大110%
+    mediaElement.style.transition = 'transform 0.5s ease-out';
+    
+    // 在视频加载完成后触发缩放动画
+    mediaElement.addEventListener('loadeddata', () => {
+      setTimeout(() => {
+        mediaElement.style.transform = 'scale(1)';
+      }, 100); // 延迟触发确保动画流畅
+    });
+    
+    // 2. 添加鼠标视差效果
+    const mediaContainer = document.getElementById('page-header');
+    mediaContainer.style.overflow = 'hidden'; // 确保放大后不出现滚动条
+    mediaElement.style.transformOrigin = 'center center';
+    
+    // 视差效果参数
+    const parallaxIntensity = 0.05; // 移动强度
+    const scaleIntensity = 0.05;    // 缩放强度
+    
+    mediaContainer.addEventListener('mousemove', (e) => {
+      const rect = mediaContainer.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;  // 鼠标X位置百分比 (0-1)
+      const y = (e.clientY - rect.top) / rect.height;   // 鼠标Y位置百分比 (0-1)
+      
+      // 计算视差偏移（反向移动）
+      const moveX = (x - 0.5) * parallaxIntensity * 100; // -5% 到 5%
+      const moveY = (y - 0.5) * parallaxIntensity * 100;
+      
+      // 应用视差效果：移动+缩放
+      mediaElement.style.transform = `
+        translate(${moveX}%, ${moveY}%)
+        scale(${1 + scaleIntensity})
+      `;
+    });
+    
+    mediaContainer.addEventListener('mouseleave', () => {
+      // 鼠标离开时恢复原始状态
+      mediaElement.style.transform = 'scale(1)';
+    });
+  }
+}
 // 初始化函数
 function initMedia() {
   if (document.readyState === 'loading') {
@@ -584,6 +633,7 @@ setTimeout(() => {
     initResponsiveBackground();
   }
 }, 1000);
+
 
   /**
    * PhotoFigcaption
