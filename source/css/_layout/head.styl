@@ -8,23 +8,32 @@
    
   // index
 
-  #home-media-container
-  position: absolute
-  top: 0
-  left: 0
-  width: 100%
-  height: 100%
-  overflow: hidden
-  z-index: 0
-
-  .home-media
-    position: absolute
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
-    object-fit: cover
-    transition: opacity 0.5s ease
+  #home-media-container {
+    position: fixed; /* 改为固定定位 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    
+    /* 添加底部向上渐变遮罩 */
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 0%);
+    mask-image: linear-gradient(to top, transparent 0%, black 0%);
+  }
+  
+  .home-media {
+    position: fixed; /* 同步改为固定定位 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+    /* 添加透明度过渡 */
+    transition: opacity 0.5s ease;
+    opacity: 1;
+  }
   
     /* 自定义加载动画容器 */
   .custom-loader {

@@ -353,6 +353,117 @@ document.addEventListener("DOMContentLoaded", function () {
 // ======================= 横竖屏自适应背景媒体加载器 =======================
 let lastOrientation = null; // 记录上一次的方向状态
 
+// ================= 新增滚动渐变效果函数 =================
+function initScrollFadeEffect() {
+  const mediaContainer = document.getElementById('home-media-container');
+  if (!mediaContainer) return;
+  
+  const mediaElement = mediaContainer.querySelector('.home-media');
+  if (!mediaElement) return;
+  
+  // 节流函数优化性能
+  function throttle(func, limit) {
+    let lastFunc, lastRan;
+    return function() {
+      const context = this;
+      const args = arguments;
+      if (!lastRan) {
+        func.apply(context, args);
+        lastRan = Date.now();
+      } else {
+        clearTimeout(lastFunc);
+        lastFunc = setTimeout(function() {
+          if ((Date.now() - lastRan) >= limit) {
+            func.apply(context, args);
+            lastRan = Date.now();
+          }
+        }, limit - (Date.now() - lastRan));
+      }
+    }
+  }
+
+  // 处理滚动时的透明度变化
+  function handleScrollFade() {
+    const scrollY = window.scrollY;
+    const windowHeight = window.innerHeight;
+    
+    // 计算透明度：从1（完全不透明）到0（完全透明）
+    // 当滚动到一屏高度时，透明度变为0
+    let opacity = 1 - (scrollY / windowHeight);
+    opacity = Math.max(0, Math.min(1, opacity)); // 限制在0-1范围
+    
+    mediaElement.style.opacity = opacity;
+  }
+
+  // 节流处理滚动事件（每50ms检查一次）
+  const throttledScrollHandler = throttle(handleScrollFade, 50);
+  
+  // 添加滚动监听
+  window.addEventListener('scroll', throttledScrollHandler);
+  
+  // 初始化时执行一次
+  handleScrollFade();
+  
+  // 存储当前滚动处理器以便后续移除
+  return throttledScrollHandler;
+}
+
+
+// ================= 滚动渐变效果函数结束 =================
+
+// ================= 新增底部遮罩层控制函数 =================
+function initScrollMaskEffect() {
+  const mediaContainer = document.getElementById('home-media-container');
+  if (!mediaContainer) return;
+  
+  // 节流函数优化性能
+  function throttle(func, limit) {
+    let lastFunc, lastRan;
+    return function() {
+      const context = this;
+      const args = arguments;
+      if (!lastRan) {
+        func.apply(context, args);
+        lastRan = Date.now();
+      } else {
+        clearTimeout(lastFunc);
+        lastFunc = setTimeout(function() {
+          if ((Date.now() - lastRan) >= limit) {
+            func.apply(context, args);
+            lastRan = Date.now();
+          }
+        }, limit - (Date.now() - lastRan));
+      }
+    }
+  }
+
+  // 处理滚动时的遮罩变化
+  function handleScrollMask() {
+    const scrollY = window.scrollY;
+    const windowHeight = window.innerHeight;
+    
+    // 计算遮罩高度（0-100%）
+    let maskHeight = (scrollY / windowHeight) * 100;
+    maskHeight = Math.min(100, Math.max(0, maskHeight));
+    
+    // 动态设置遮罩层高度
+    mediaContainer.style.setProperty('--mask-height', `${maskHeight}%`);
+  }
+
+  // 节流处理滚动事件（每50ms检查一次）
+  const throttledScrollHandler = throttle(handleScrollMask, 50);
+  
+  // 添加滚动监听
+  window.addEventListener('scroll', throttledScrollHandler);
+  
+  // 初始化时执行一次
+  handleScrollMask();
+  
+  // 返回处理器以便后续移除
+  return throttledScrollHandler;
+}
+
+
 function initResponsiveBackground() {
   const mediaContainer = document.getElementById('home-media-container');
   if (!mediaContainer) {
@@ -403,11 +514,17 @@ function initResponsiveBackground() {
   const mediaElement = document.createElement(mediaType);
   mediaElement.className = 'home-media';
   mediaElement.style.cssText = 'width:100%;height:100%;object-fit:cover';
-   // 在媒体容器添加媒体元素后调用效果函数
-   mediaContainer.appendChild(mediaElement);
-   addMediaEffects(mediaElement, mediaType); // 添加新功能
+  
+  // ================= 设置初始透明度 =================
+  mediaElement.style.opacity = '1';
+  mediaElement.style.transition = 'opacity 0.5s ease';
+  // ================================================
+  
+  // 在媒体容器添加媒体元素后调用效果函数
+  mediaContainer.appendChild(mediaElement);
+  addMediaEffects(mediaElement, mediaType); // 添加新功能
    
-   console.log('[背景加载器] 媒体元素已创建');
+  console.log('[背景加载器] 媒体元素已创建');
    
   // 创建自定义加载动画容器
   const loaderContainer = document.createElement('div');
@@ -492,6 +609,9 @@ function initResponsiveBackground() {
 
   mediaContainer.appendChild(mediaElement);
   console.log('[背景加载器] 媒体元素已创建');
+  
+  // ================= 初始化滚动渐变效果 =================
+  initScrollFadeEffect();
 }
 
 function addMediaEffects(mediaElement, mediaType) {
@@ -507,45 +627,146 @@ function addMediaEffects(mediaElement, mediaType) {
       }, 100); // 延迟触发确保动画流畅
     });
     
-    // 2. 添加鼠标视差效果
+    // 2. 添加视差效果（鼠标/陀螺仪）
     const mediaContainer = document.getElementById('page-header');
-    mediaContainer.style.overflow = 'hidden'; // 确保放大后不出现滚动条
+    mediaContainer.style.overflow = 'hidden';
     mediaElement.style.transformOrigin = 'center center';
     
     // 视差效果参数
-    const parallaxIntensity = 0.05; // 移动强度
-    const scaleIntensity = 0.05;    // 缩放强度
+    const parallaxIntensity = 0.05;
+    const scaleIntensity = 0.05;
+    let isGyroActive = false;
     
-    mediaContainer.addEventListener('mousemove', (e) => {
-      const rect = mediaContainer.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;  // 鼠标X位置百分比 (0-1)
-      const y = (e.clientY - rect.top) / rect.height;   // 鼠标Y位置百分比 (0-1)
+    // ================= 新增陀螺仪支持 =================
+    // 检测陀螺仪支持
+    function initGyroParallax() {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        // iOS 13+ 需要权限
+        DeviceOrientationEvent.requestPermission()
+          .then(permissionState => {
+            if (permissionState === 'granted') {
+              setupGyroListeners();
+              isGyroActive = true;
+            }
+          })
+          .catch(console.error);
+      } else if ('DeviceOrientationEvent' in window) {
+        // Android和其他支持设备
+        setupGyroListeners();
+        isGyroActive = true;
+      }
       
-      // 计算视差偏移（反向移动）
-      const moveX = (x - 0.5) * parallaxIntensity * 100; // -5% 到 5%
-      const moveY = (y - 0.5) * parallaxIntensity * 100;
+      return isGyroActive;
+    }
+    
+    // 设置陀螺仪监听
+    function setupGyroListeners() {
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+    
+    // 处理陀螺仪数据
+    function handleOrientation(event) {
+      if (!isGyroActive) return;
       
-      // 应用视差效果：移动+缩放
+      // 获取陀螺仪数据（beta: 前后倾斜, gamma: 左右倾斜）
+      const beta = event.beta || 0;  // 前后倾斜（-180到180）
+      const gamma = event.gamma || 0; // 左右倾斜（-90到90）
+      
+      // 将角度转换为百分比偏移（归一化处理）
+      const moveX = (gamma / 90) * parallaxIntensity * 100; // -100% 到 100%
+      const moveY = (beta / 180) * parallaxIntensity * 100; 
+      
+      // 应用视差效果
       mediaElement.style.transform = `
         translate(${moveX}%, ${moveY}%)
         scale(${1 + scaleIntensity})
       `;
-    });
+    }
     
-    mediaContainer.addEventListener('mouseleave', () => {
-      // 鼠标离开时恢复原始状态
-      mediaElement.style.transform = 'scale(1)';
+    // ================= 鼠标视差效果 =================
+    function initMouseParallax() {
+      mediaContainer.addEventListener('mousemove', (e) => {
+        const rect = mediaContainer.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        
+        const moveX = (x - 0.5) * parallaxIntensity * 100;
+        const moveY = (y - 0.5) * parallaxIntensity * 100;
+        
+        mediaElement.style.transform = `
+          translate(${moveX}%, ${moveY}%)
+          scale(${1 + scaleIntensity})
+        `;
+      });
+      
+      mediaContainer.addEventListener('mouseleave', () => {
+        mediaElement.style.transform = 'scale(1)';
+      });
+    }
+    
+    // ================= 根据设备类型初始化 =================
+    // 检测移动设备
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // 移动设备优先使用陀螺仪
+      if (!initGyroParallax()) {
+        // 不支持陀螺仪则回退到触摸事件
+        initTouchParallax();
+      }
+    } else {
+      // PC设备使用鼠标事件
+      initMouseParallax();
+    }
+    
+    // ================= 触摸事件回退方案 =================
+    function initTouchParallax() {
+      mediaContainer.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = mediaContainer.getBoundingClientRect();
+        const x = (touch.clientX - rect.left) / rect.width;
+        const y = (touch.clientY - rect.top) / rect.height;
+        
+        const moveX = (x - 0.5) * parallaxIntensity * 50; // 移动强度减半
+        const moveY = (y - 0.5) * parallaxIntensity * 50;
+        
+        mediaElement.style.transform = `
+          translate(${moveX}%, ${moveY}%)
+          scale(${1 + scaleIntensity * 0.5}) // 缩放强度减半
+        `;
+      });
+      
+      mediaContainer.addEventListener('touchend', () => {
+        mediaElement.style.transform = 'scale(1)';
+      });
+    }
+    
+    // ================= 性能优化 =================
+    // 页面不可见时暂停陀螺仪
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        isGyroActive = false;
+      } else if (isMobile) {
+        isGyroActive = initGyroParallax();
+      }
     });
   }
 }
-// 初始化函数
+
+// 在initMedia函数中调用新功能
 function initMedia() {
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initResponsiveBackground);
+    document.addEventListener('DOMContentLoaded', function() {
+      initResponsiveBackground();
+      initScrollFadeEffect(); // 添加调用
+    });
   } else {
     initResponsiveBackground();
+    initScrollFadeEffect(); // 添加调用
   }
 }
+
 
 // ======================= 执行入口 =======================
 initMedia();
@@ -565,6 +786,8 @@ window.addEventListener('resize', () => {
       initResponsiveBackground();
     } else {
       console.log('[背景加载器] 窗口大小变化但方向未改变');
+      // ================= 方向未变时重置透明度 =================
+      initScrollFadeEffect();
     }
   }, 500);
 });
@@ -577,6 +800,8 @@ document.addEventListener('visibilitychange', () => {
       console.log('[背景加载器] 页面恢复可见，重新播放视频');
       video.play().catch(e => console.warn('视频恢复播放失败:', e));
     }
+    // ================= 页面恢复可见时重置透明度 =================
+    initScrollFadeEffect();
   }
 });
 
@@ -588,6 +813,8 @@ window.addEventListener('pageshow', event => {
     console.log('[修复] 检测到缓存恢复主页，强制重置');
     lastOrientation = null;
     initResponsiveBackground();
+    // ================= 缓存恢复时重置透明度 =================
+    setTimeout(initScrollFadeEffect, 300);
   }
 });
 
@@ -602,6 +829,8 @@ window.addEventListener('popstate', () => {
         lastOrientation = null;
         initResponsiveBackground();
       }
+      // ================= 返回主页时重置透明度 =================
+      initScrollFadeEffect();
     }, 300); // 延迟确保DOM更新
   }
 });
@@ -619,6 +848,8 @@ function checkMediaStatus() {
     lastOrientation = null;
     initResponsiveBackground();
   }
+  // ================= 媒体自检时重置透明度 =================
+  initScrollFadeEffect();
 }
 
 // 每0.5秒检查一次（轻量级检测）
@@ -631,6 +862,8 @@ setTimeout(() => {
     console.warn('[修复] 尝试完全重建');
     lastOrientation = null;
     initResponsiveBackground();
+    // ================= 错误重建时重置透明度 =================
+    setTimeout(initScrollFadeEffect, 500);
   }
 }, 1000);
 
