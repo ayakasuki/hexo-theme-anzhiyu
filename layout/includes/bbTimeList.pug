@@ -12,6 +12,229 @@ if site.data.essay
                   if index < 10
                     - var contentText = item.image ? item.content + ' [图片]' : (item.video ? item.content + ' [视频]' : item.content)
                     a.li-style.swiper-slide(href=href_value)= contentText
-          a.bber-gotobb.anzhiyufont.anzhiyu-icon-circle-arrow-right( onclick=onclick_value, href=href_value, title="查看全文")
+          a.bber-gotobb.anzhiyufont.anzhiyu-icon-circle-arrow-right(onclick=onclick_value, href=href_value, title="查看全文")
+          // 动物元素容器（关键修改点）
+          .con-animals-container
+            img.con-animals(id="new-con-animals-1" data-index="1" style="display: none;")
+            img.con-animals(id="new-con-animals-2" data-index="2" style="display: none;")
+            img.con-animals(id="new-con-animals-3" data-index="3" style="display: none;")
+            img.con-animals(id="new-con-animals-4" data-index="3" style="display: none;")
+            img.con-animals(id="new-con-animals-5" data-index="3" style="display: none;")
+            img.con-animals(id="new-con-animals-6" data-index="3" style="display: none;")
 
       script(src=url_for(theme.home_top.swiper.swiper_js))
+
+style.
+  #bbTimeList {
+    position: relative;
+  }
+
+  .con-animals {
+    display: block;
+    position: absolute;
+    max-width: 180px;
+    top: -103px;
+    z-index: 2;
+  }
+
+  .con-animals-2 {
+    display: block;
+    position: absolute;
+    max-width: 200px;
+    top: -130px;
+    z-index: 2;
+  }
+
+  .con-animals-3 {
+    display: block;
+    position: absolute;
+    max-width: 235px;
+    top: -110px;
+    z-index: 2;
+  }
+
+  .con-animals-4 {
+    display: block;
+    position: absolute;
+    max-width: 180px;
+    top: -85px;
+    z-index: 2;
+  }
+
+  .con-animals-5 {
+    display: block;
+    position: absolute;
+    max-width: 180px;
+    top: -90px;
+    z-index: 2;
+  }
+
+  .con-animals-6 {
+    display: block;
+    position: absolute;
+    max-width: 200px;
+    top: -85px;
+    z-index: 2;
+  }
+
+  @media screen and (max-width: 1200px) {
+    .con-animals, .con-animals-2 {
+      display: none;
+    }
+  }
+
+script.
+  // 全局变量存储当前显示的动物元素索引
+  window.lastAnimalIndex = window.lastAnimalIndex || null;
+  
+  function setRandomAnimal() {
+    const animalElements = [
+      { 
+        id: "new-con-animals-1", 
+        styleClass: "con-animals",   // 修正：移除点号
+        url: "https://tc.ayakasuki.com/a/2025/06/09/biji6846ff8bb9064.png" 
+      },
+      { 
+        id: "new-con-animals-2", 
+        styleClass: "con-animals-2", // 修正：移除点号
+        url: "https://tc.ayakasuki.com/a/2025/06/09/biji6847031af356b.png" 
+      },
+      { 
+        id: "new-con-animals-3", 
+        styleClass: "con-animals-3", // 修正：移除点号
+        url: "https://tc.ayakasuki.com/a/2025/06/10/biji68470ab019df4.png" 
+      },
+      { 
+        id: "new-con-animals-4", 
+        styleClass: "con-animals-4", // 修正：移除点号
+        url: "https://tc.ayakasuki.com/a/2025/06/10/biji68470ab0aa8d7.png" 
+      },
+      { 
+        id: "new-con-animals-5", 
+        styleClass: "con-animals-5", // 修正：移除点号
+        url: "https://tc.ayakasuki.com/a/2025/06/10/biji68470bfd33e1c.png" 
+      },
+      { 
+        id: "new-con-animals-6", 
+        styleClass: "con-animals-6", // 修正：移除点号
+        url: "https://tc.ayakasuki.com/a/2025/06/10/biji68470e009d470.png" 
+      }
+    ];
+
+    // 隐藏所有动物元素
+    document.querySelectorAll('[id^="new-con-animals"]').forEach(el => {
+      el.style.display = 'none';
+      // 清除旧样式类
+      el.classList.remove("con-animals", "con-animals-2");
+    });
+
+    // 随机选择元素
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * animalElements.length);
+    } while (randomIndex === window.lastAnimalIndex && animalElements.length > 1);
+
+    window.lastAnimalIndex = randomIndex;
+    const selected = animalElements[randomIndex];
+    const animalEl = document.getElementById(selected.id);
+
+    if (animalEl) {
+      // 关键修复：设置实际URL
+      animalEl.src = selected.url;
+      
+      // 添加专属样式类
+      animalEl.classList.add(selected.styleClass);
+      animalEl.style.display = 'block';
+      
+      // 处理加载状态
+      animalEl.onload = () => {
+        animalEl.dataset.llStatus = "loaded";
+        animalEl.classList.add("loaded");
+      };
+      
+      animalEl.onerror = () => {
+        animalEl.src = "/img/404.jpg";
+        animalEl.dataset.llStatus = "error";
+      };
+      
+      return animalEl;
+    }
+  }
+
+  function initializeDragImage() {
+    // 设置随机动物并获取当前显示的元素
+    const img = setRandomAnimal();
+    const container = document.getElementById('bbTimeList');
+    
+    if (!img || !container) return;
+
+    let isDragging = false, wasDragged = false, startX, startLeft;
+    const containerWidth = container.clientWidth;
+    const imgWidth = img.clientWidth;
+    const maxLeft = containerWidth - imgWidth;
+    const edgeThreshold = 20;
+    
+    // 从localStorage加载位置
+    let lastLeft = parseInt(localStorage.getItem(`animalPos_${window.lastAnimalIndex}`)) || 0;
+    lastLeft = Math.min(maxLeft, Math.max(0, lastLeft));
+    img.style.left = `${lastLeft}px`;
+
+    const savePosition = (left) => {
+      localStorage.setItem(`animalPos_${window.lastAnimalIndex}`, left);
+    };
+
+    img.addEventListener('click', () => {
+      if (!wasDragged) {
+        let currentLeft = lastLeft;
+        let newLeft;
+
+        if (currentLeft <= edgeThreshold) {
+          newLeft = Math.min(currentLeft + 200, maxLeft);
+        } else if (currentLeft >= maxLeft - edgeThreshold) {
+          newLeft = Math.max(currentLeft - 200, 0);
+        } else {
+          newLeft = currentLeft + (Math.random() < 0.5 ? -200 : 200);
+          newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+        }
+
+        if (newLeft !== lastLeft) {
+          lastLeft = newLeft;
+          img.style.left = `${newLeft}px`;
+          savePosition(newLeft);
+        }
+      }
+      wasDragged = false; // 重置拖拽状态
+    });
+
+    img.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      wasDragged = false;
+      startX = e.clientX;
+      startLeft = lastLeft;
+      img.style.transition = 'none';
+
+      const onMouseMove = (e) => {
+        if (!isDragging) return;
+        wasDragged = true;
+        const offsetX = e.clientX - startX;
+        lastLeft = Math.max(0, Math.min(startLeft + offsetX, maxLeft));
+        requestAnimationFrame(() => {
+          img.style.left = `${lastLeft}px`;
+        });
+      };
+
+      const onMouseUp = () => {
+        isDragging = false;
+        img.style.transition = 'left 0.5s ease-in-out';
+        savePosition(lastLeft);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initializeDragImage);
+  document.addEventListener('pjax:success', initializeDragImage);

@@ -19,22 +19,26 @@ mixin postUI(posts)
 
       if post_cover && theme.cover.index_enable
         .post_cover(class=leftOrRight)
-          a(href=url_for(link) title=title style='display: flex;height: 100%;')
-            img.post_bg(src=url_for(post_cover) onerror=`this.onerror=null;this.src='`+ url_for(theme.error_img.post_page) + `'` alt=title style='pointer-events: none')
-
-      .recent-post-info(class=no_cover)
-        .recent-post-info-top
-          .recent-post-info-top-tips
+          .recent-post-info-top-tips(class=leftOrRight)
             if (is_home() && (article.top || article.sticky > 0))
               span.article-meta.sticky-warp
                 i.anzhiyufont.anzhiyu-icon-thumbtack.sticky
                 span.sticky= _p('sticky')
             if (theme.post_meta.page.categories && article.categories.data.length > 0)
               each item, index in article.categories.data
-                .article-categories-original=item.name
+                .article-categories-original
+                  i.fas.fa-shapes
+                  =item.name
             if new_post
-              span.newPost 最新
+              span.newPost
+                i.fas.fa-star
+                span 最新
             a.unvisited-post(href=url_for(link) title=title) 未读
+          a(href=url_for(link) title=title style='display: flex;height: 100%;')
+            img.post_bg(src=url_for(post_cover) onerror=`this.onerror=null;this.src='`+ url_for(theme.error_img.post_page) + `'` alt=title style='pointer-events: none')
+
+      .recent-post-info(class=no_cover)
+        .recent-post-info-top
           a.article-title(href=url_for(link) title=title)= title
         .article-meta-wrap
           if (theme.post_meta.page.date_type)
@@ -62,10 +66,10 @@ mixin postUI(posts)
             span.article-meta.tags
               each item, index in article.tags.data
                 a(href=url_for(item.path) event.cancelbubble onclick="window.event.cancelBubble=true;").article-meta__tags
-                  span 
+                  span
                     i.anzhiyufont.anzhiyu-icon-hashtag
                     =item.name
-          
+
           mixin countBlockInIndex
             - needLoadCountJs = true
             span.article-meta
@@ -74,7 +78,7 @@ mixin postUI(posts)
               if block
                 block
               span.article-meta-label= ' ' + _p('card_post_count')
-          
+
           if theme.comments.card_post_count
             case theme.comments.use[0]
               when 'Valine'
@@ -108,12 +112,12 @@ mixin postUI(posts)
               .content!= article.description
             else
               - const content = strip_html(article.content)
-              - let expert = content.substring(0, theme.index_post_content.length) 
+              - let expert = content.substring(0, theme.index_post_content.length)
               - content.length > theme.index_post_content.length ? expert += ' ...' : ''
               .content!= expert
           default
             - const content = strip_html(article.content)
-            - let expert = content.substring(0, theme.index_post_content.length) 
+            - let expert = content.substring(0, theme.index_post_content.length)
             - content.length > theme.index_post_content.length ? expert += ' ...' : ''
             .content!= expert
 
