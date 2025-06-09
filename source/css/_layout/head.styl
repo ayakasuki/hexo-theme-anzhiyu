@@ -6,68 +6,6 @@
     box-shadow: none;
     transition: 0.3s;
    
-  // index
-
-  #home-media-container {
-    position: fixed; /* 改为固定定位 */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: 0;
-    
-    /* 添加底部向上渐变遮罩 */
-    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 0%);
-    mask-image: linear-gradient(to top, transparent 0%, black 0%);
-  }
-  
-  .home-media {
-    position: fixed; /* 同步改为固定定位 */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    
-    /* 添加透明度过渡 */
-    transition: opacity 0.5s ease;
-    opacity: 1;
-  }
-  
-    /* 自定义加载动画容器 */
-  .custom-loader {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10; /* 确保在视频上方 */
-    pointer-events: none; /* 防止阻挡视频交互 */
-    transition: opacity 0.5s ease; /* 淡出动画 */
-  }
-
-  /* 加载动画元素 */
-  .loader-animation {
-    width: 18%;
-    height: 18%;
-    min-width: 128px;
-    min-height: 128px;
-    background-size: contain; /* 保持比例 */
-    background-position: center;
-    background-repeat: no-repeat;
-    animation: pulse 1.5s infinite ease-in-out;
-  }
-
-  /* 呼吸动画效果 */
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.8; }
-  }
   &.full_page
     height: $index_top_img_height
     background-attachment: fixed
