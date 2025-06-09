@@ -530,6 +530,61 @@ document.addEventListener('visibilitychange', () => {
     }
   }
 });
+
+// ========== 新增修复代码（直接加在现有代码后面） ========== //
+
+// 1. 缓存恢复检测（核心修复）
+window.addEventListener('pageshow', event => {
+  if (event.persisted && location.pathname === '/') {
+    console.log('[修复] 检测到缓存恢复主页，强制重置');
+    lastOrientation = null;
+    initResponsiveBackground();
+  }
+});
+
+// 2. 路由变化监听（SPA兼容）
+window.addEventListener('popstate', () => {
+  if (location.pathname === '/') {
+    console.log('[修复] 检测到返回主页');
+    setTimeout(() => {
+      // 检查媒体元素是否存在
+      const container = document.getElementById('home-media-container');
+      if (!container?.querySelector('.home-media')) {
+        lastOrientation = null;
+        initResponsiveBackground();
+      }
+    }, 300); // 延迟确保DOM更新
+  }
+});
+
+// 3. 媒体状态自检（兜底方案）
+function checkMediaStatus() {
+  if (location.pathname !== '/') return;
+  
+  const container = document.getElementById('home-media-container');
+  if (!container) return;
+  
+  const hasMedia = container.querySelector('.home-media');
+  if (!hasMedia) {
+    console.log('[修复] 自检发现媒体丢失');
+    lastOrientation = null;
+    initResponsiveBackground();
+  }
+}
+
+// 每5秒检查一次（轻量级检测）
+setInterval(checkMediaStatus, 5000);
+
+// 4. 增强错误处理（在initResponsiveBackground函数内修改）
+// 在mediaElement.onerror函数内添加：
+setTimeout(() => {
+  if (!mediaElement.parentNode) {
+    console.warn('[修复] 尝试完全重建');
+    lastOrientation = null;
+    initResponsiveBackground();
+  }
+}, 1000);
+
   /**
    * PhotoFigcaption
    */
