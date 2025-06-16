@@ -53,11 +53,11 @@ header#page-header(class=`${isHomeClass}`)
         // 媒体容器（继承原主题背景参数）
         #home-media-container(
             data-landscape-img=home_index_img ? homeImg : ''
-            data-portrait-img=home_index_img && theme.index_img.path2 ? url_for(theme.index_img.path2) : ''
+            data-portrait-img=home_index_img && theme.index_img.vpath ? url_for(theme.index_img.vpath) : ''
             data-landscape-video=home_index_video ? homeVideo : ''
-            data-portrait-video=home_index_video && theme.index_video.path2 ? url_for(theme.index_video.path2) : ''
+            data-portrait-video=home_index_video && theme.index_video.vpath ? url_for(theme.index_video.vpath) : ''
             data-landscape-poster=home_index_video && theme.index_video.poster ? url_for(theme.index_video.poster) : ''
-            data-portrait-poster=home_index_video && theme.index_video.poster2 ? url_for(theme.index_video.poster2) : ''
+            data-portrait-poster=home_index_video && theme.index_video.vposter ? url_for(theme.index_video.vposter) : ''
             style="height:100%;background-attachment:fixed;z-index:0"
           )
         #site-info

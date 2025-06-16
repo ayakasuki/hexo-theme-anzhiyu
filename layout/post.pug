@@ -6,6 +6,8 @@ block content
       include includes/header/post-info.pug
     if theme.post_head_ai_description
       include includes/anzhiyu/ai-info.pug
+    if page.summary && theme.ai_summary.enable
+      include includes/post/post-summary.pug
     - let url = page.copyright_url || page.permalink
     article#article-container.post-content(itemscope itemtype=url_for(url))
       header

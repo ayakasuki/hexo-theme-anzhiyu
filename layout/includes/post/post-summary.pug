@@ -1,0 +1,18 @@
+- let pageFillDescription = get_page_fill_description()
+- let modelName = theme.ai_summary.modelName
+if (theme.ai_summary.enable && page.summary)
+  .post-ai-description
+    .ai-title
+      i.anzhiyufont.anzhiyu-icon-bilibili
+      .ai-title-text=theme.ai_summary.title
+      i.anzhiyufont.anzhiyu-icon-arrow-rotate-right
+      i.anzhiyufont.anzhiyu-icon-circle-dot(title="朗读摘要")
+      #ai-tag= theme.ai_summary.modelName
+    .ai-explanation-2(data-summary=page.summary)=theme.ai_summary.loadingText
+    .ai-btn-box-2 
+      .ai-btn-item-2 介绍自己 🙈
+      .ai-btn-item-2 生成本文简介 👋
+      .ai-btn-item-2 推荐相关文章 📖
+      .ai-btn-item-2 前往主页 🏠
+      .ai-btn-item-2 点击与桃妹聊天🍑
+    script(data-pjax src=url_for(theme.asset.ai_summary_js))
