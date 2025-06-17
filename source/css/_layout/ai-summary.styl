@@ -44,64 +44,6 @@ beautify()
 
 if hexo-config('ai_summary.enable')
 
-  [data-theme="dark"] .ai-cursor
-    background: rgb(255, 255, 255, 0.9);
-
-  .ai-btn-box-2
-    font-size: 15.5px;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-
-  .ai-btn-item-2
-    padding: 5px 10px;
-    margin: 10px 16px 0px 5px;
-    width: fit-content;
-    line-height: 1;
-    background: var(--anzhiyu-main)
-    color: #fff;
-    border-radius: 6px;
-    user-select: none;
-    transition: all 0.3s;
-    cursor: pointer;
-    &:hover
-      background: var(--anzhiyu-theme);
-
-  .ai-recommend-2
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    .ai-recommend-item-2
-      width: calc(50% - 20px);
-      margin: 10px;
-      background: var(--anzhiyu-secondbg);
-      border-radius: 4px;
-      padding: 10px;
-      cursor pointer
-      transition: .3s;
-      animation: slide-in 0.6s 0.1s backwards;
-      span.index
-        padding: 4px
-      &:hover
-        color: var(--anzhiyu-white);
-        background: var(--anzhiyu-theme);
-        a
-          color: var(--anzhiyu-white);
- 
-  .ai-explanation-2
-    margin-top: 12px;
-    padding: 8px 12px;
-    background: var(--anzhiyu-card-bg);
-    border-radius: 8px;
-    border: var(--style-border-always);
-    font-size: 15px;
-    line-height: 1.4;
-  +maxWidth768()
-    .ai-btn-box-2
-      justify-content: center;
-    .ai-recommend-2 .ai-recommend-item-2
-      width: 100%;
 
   // 平滑滚动动画
   // @keyframes chat-float
@@ -118,3 +60,54 @@ if hexo-config('ai_summary.enable')
       opacity 1
     50%
       opacity 0
+
+  #ai-tag
+      display: inline-flex
+      align-items: center
+      gap: 8px
+      padding: 6px 14px
+      background: linear-gradient(135deg, #ff9eb5, #ff6b9c)
+      color: white
+      border-radius: 24px
+      font-weight: bold
+      box-shadow: 0 4px 12px rgba(255, 158, 181, 0.3)
+      transition: transform 0.3s
+      position: relative
+      z-index: 50
+      
+      &:hover
+          transform: scale(1.05)
+          box-shadow: 0 6px 16px rgba(255, 158, 181, 0.5)
+
+  #qq-group-popup
+      position: fixed
+      display: none
+      background: rgba(255, 255, 255, 0.95)
+      backdrop-filter: blur(5px)
+      border-radius: 12px
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15)
+      flex-direction: column
+      align-items: center
+      justify-content: space-between
+      padding: 12px
+      box-sizing: border-box
+      opacity: 0
+      transform: translateY(10px) scale(0.9)
+      transition: all 0.3s ease
+      z-index: 1000
+      width: 5vw
+      height: 7vh
+      min-width: 120px
+      min-height: 140px
+      
+      img
+          width: 80%
+          aspect-ratio: 1/1
+          object-fit: contain
+      
+      .hint
+          font-size: 12px
+          color: #666
+          text-align: center
+          margin-top: 8px
+          line-height: 1.4
