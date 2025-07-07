@@ -1,13 +1,13 @@
 /*日间夜间模式侧边栏透明模糊*/
 [data-theme=light] #rightside-container 
-  background: rgba(229,232,241,0.8)!important;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: rgba(229,232,241,0.5)!important;
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(280%);
 
 [data-theme=dark] #rightside-container 
-  background: rgba(46,45,44,.8)!important;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px)
+  background: rgba(46,45,44,.5)!important;
+  -webkit-backdrop-filter: blur(6px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(280%);
   
   #rightside-time
     color: var(--btn-color)
@@ -20,8 +20,8 @@
   bottom: $rightside-bottom
   z-index: 100
   background: var(--anzhiyu-post-blockquote-bg);
-  padding: 12px 6px
-  border-radius: 25px 25px 25px 25px
+  padding: 10px 5px
+  border-radius: 20px 20px 20px 20px
   box-shadow: var(--anzhiyu-shadow-border)
   transition: all .5s
   display: flex
@@ -33,7 +33,7 @@
     right: 0
     opacity: 1
     z-index: 101
-    margin-bottom: 10px // 与时间区域的间距
+    margin-bottom: 10px 
 
   #rightside-time
     display: flex
@@ -43,7 +43,7 @@
     font-size: 12px
     color: var(--btn-bg)
     line-height: 1.4
-    padding-top: 5px
+    padding-top: 0px
     border-top: none
     width: 100%
     
@@ -79,7 +79,7 @@
     & > a
       display: block
       margin-bottom: 10px
-      width: w = 40px
+      width: w = 35px
       height: w
       border-radius: 100% !important
       background-color: var(--btn-bg)

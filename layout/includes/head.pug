@@ -71,6 +71,13 @@ if theme.fancybox
 if site.data.essay || theme.home_top.swiper.enable
   link(rel='stylesheet' href=url_for(theme.home_top.swiper.swiper_css) media="print" onload="this.media='all'")
 
+//- Umami
+if theme.Umami
+  if theme.Umami.umami_url
+    script(async defer src=`${theme.Umami.umami_url_js}` data-website-id=`${theme.Umami.umami_id}` data-host-url=`${theme.Umami.umami_url}`)
+  else
+    script(async defer src=`${theme.Umami.umami_url_js}` data-website-id=`${theme.Umami.umami_id}`)
+
 //- google_adsense
 !=partial('includes/head/google_adsense', {}, {cache: true})
 
