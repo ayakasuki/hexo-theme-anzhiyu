@@ -1,9 +1,9 @@
-if theme.footer.ayakasukiFooterBar && theme.footer.ayakasukiFooterBar.enable && is_post()
+if theme.footer.ayakasukiFooterBar && theme.footer.ayakasukiFooterBar.enable
   .ayakasuki-footer-bar
     .footer-logo
     if theme.footer.ayakasukiFooterBar.description
       .footer-bar-description!= theme.footer.ayakasukiFooterBar.description
-    a.ayakasuki-footer-bar-link(href=url_for('/')) 了解更多 
+    a.ayakasuki-footer-bar-link(href=url_for('/')) 了解更多
 
 #footer-wrap
   if theme.footer.socialBar.enable
